@@ -2,7 +2,8 @@ CPPFLAGS = -Wall -g
 LDFLAGS = -lpq
 OBJDIR = obj/
 SRCDIR = src/
-INCDIR = include/
+INCDIRS = include/ /usr/include/postgresql/
+INC = $(foreach d, $(INCDIRS), -I$d)
 OUTPUT = test
 
 RM = rm -rf
@@ -17,7 +18,7 @@ psql: $(OBJS)
 
 $(OBJDIR)%.o: $(SRCDIR)%.cpp
 	@mkdir -p $(@D)
-	g++ $(CPPFLAGS) -I $(INCDIR) -c $< -o $@
+	g++ $(CPPFLAGS) $(INC) -c $< -o $@
 
 clean:
 	$(RM) $(OBJDIR)* $(OUTPUT)
