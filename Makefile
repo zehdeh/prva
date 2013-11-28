@@ -1,8 +1,8 @@
 CPPFLAGS = -Wall -g
-LDFLAGS = -lpq
+LDFLAGS = -lpqxx
 OBJDIR = obj/
 SRCDIR = src/
-INCDIRS = include/ /usr/include/postgresql/
+INCDIRS = include/ 
 INC = $(foreach d, $(INCDIRS), -I$d)
 OUTPUT = test
 

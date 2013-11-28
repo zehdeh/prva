@@ -1,0 +1,6 @@
+package "psql_versionanalyzer"
+version "1.0"
+usage "psql_versionanalyzer [OPTIONS] --database DATABASE --relation RELNAME"
+description "Outputs non-vacuumed states of tuples from a given a relation as they appear on a postgres-page"
+option "relation" r "The relation that should be analyzed" string typestr="RELATION" required
+option "database" d "The database that contains the relation" string typestr="RELATION" required

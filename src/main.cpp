@@ -1,127 +1,50 @@
 #include <iostream>
-#include <fstream>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <libpq-fe.h>
+
+#include "cmdline.h"
+#include "HTMLRenderer.h"
+#include "AnalyzerSetup.h"
 
 #define PGDATABASE test
 
-void exit_nicely(PGconn * conn) {
-   PQfinish(conn);
-   exit(1);
-}
-
-void checkCommand(PGresult * res, const char * identifier, ExecStatusType status, PGconn * conn) {
-   if(PQresultStatus(res) != status) {
-      std::cout << identifier << " failed: " << PQerrorMessage(conn) << std::endl;
-      PQclear(res);
-      exit_nicely(conn);
-   }
-}
-
-void outputFile(const char * fileName) {
-   std::ifstream header(fileName, std::ios::in);
-
-   if(header.is_open()) {
-      std::string s;
-      while(getline(header,s)) {
-         std::cout << s << std::endl;
-      }
-
-      header.close();
-   }
-}
-
-void renderTable(char * bin, int nTuples, int freespaceLower, int freespaceUpper, int * lp_off, int * lp_len) {
-   int binaryLen = strlen(bin);
-
-   bool tuple_open = false;
-   for(int i = 0; i < binaryLen; i++) {
-      if(i == freespaceLower) {
-         std::cout << "<span class=\"range freespace\">" << std::endl;   
-      }
-
-      if(i == freespaceUpper) {
-         std::cout << "</span>" << std::endl;   
-      }
-
-      for(int j = 0; j < nTuples; j++) {
-         if(!tuple_open && (i == lp_off[j])) {
-            tuple_open = true;
-            std::cout << "<span class=\"range tuple\">" << std::endl;
-         }
-      }
-      std::cout << bin[i] << std::endl;
-
-      for(int j = 0; j < nTuples; j++) {
-         if(tuple_open && i == (lp_off[j] + lp_len[j])) {
-            tuple_open = false;
-            std::cout << "</span>" << std::endl;   
-         }
-      }
-      for(int j = 0; j < nTuples; j++) {
-         if(!tuple_open && (i == lp_off[j])) {
-            tuple_open = true;
-            std::cout << "<span class=\"range tuple\">" << std::endl;
-         }
-      }
-   }
-   if(tuple_open) {
-      tuple_open = false;
-      std::cout << "</span>" << std::endl;   
-   }
-}
-
 int main(int argc, char** argv) {
+   gengetopt_args_info args_info;
 
-   const char * conninfo = "dbname = fabian";
-   PGconn * conn;
-   PGresult * res;
-
-   conn = PQconnectdb(conninfo);
-   if(PQstatus(conn) != CONNECTION_OK) {
-      std::cout << "Verbindung fehlgeschlagen: " << PQerrorMessage(conn) << std::endl;
-      exit_nicely(conn);
+   if(cmdline_parser(argc, argv, &args_info) != 0) {
+         exit(1);
    }
 
-   res = PQexec(conn, "BEGIN");
-   checkCommand(res, "Beginning transaction", PGRES_COMMAND_OK, conn);
+   const char * conninfo = (std::string("dbname=") + std::string(args_info.database_arg)).c_str();
+   std::cout << conninfo << std::endl;
 
-   res = PQexec(conn, "DECLARE pageheader_cursor CURSOR FOR SELECT lower,upper FROM page_header(get_raw_page('users', 0))");
-   checkCommand(res, "Declaring cursor for pageheader", PGRES_COMMAND_OK, conn);
+   try {
+      AnalyzerSetup setup(conninfo, args_info.relation_arg);
 
-   res = PQexec(conn, "DECLARE raw_cursor CURSOR FOR SELECT encode(get_raw_page::bytea, 'hex') FROM get_raw_page('users', 0)");
-   checkCommand(res, "Declaring cursor for get_raw_page", PGRES_COMMAND_OK, conn);
+      int freespace_lbound = setup.get_freespace_lower_bound();
+      int freespace_ubound = setup.get_freespace_upper_bound();
+      std::cout << freespace_lbound << ":" << freespace_ubound << std::endl;
+   } catch(const std::exception &e) {
+      std::cerr << e.what() << std::endl;
+      return 1;
+   }
 
-   res = PQexec(conn, "DECLARE items_cursor CURSOR FOR SELECT lp_off, lp_len FROM heap_page_items(get_raw_page('users', 0)) order by lp desc");
-   checkCommand(res, "Declaring cursor for heap_page_items", PGRES_COMMAND_OK, conn);
 
-   res = PQexec(conn, "FETCH ALL IN pageheader_cursor");
-   checkCommand(res, "Fetching from pageheader_cursor", PGRES_TUPLES_OK, conn);
+   HTMLRenderer renderer("resource/footer.html", "resource/header.html");
+   std::cout << renderer.render();
 
-   int freespaceLower = atoi(PQgetvalue(res,0,0)) * 2;
-   int freespaceUpper = atoi(PQgetvalue(res,0,1)) * 2;
-
-   res = PQexec(conn, "CLOSE pageheader_cursor");
-   checkCommand(res, "Closing pageheader_cursor", PGRES_COMMAND_OK, conn);
-   PQclear(res);
-
-   res = PQexec(conn, "FETCH ALL IN raw_cursor");
-   checkCommand(res, "Fetching from raw_cursor", PGRES_TUPLES_OK, conn);
-
-   char * binaryPage = PQgetvalue(res, 0, 0);
+   //char * binaryPage = PQgetvalue(res, 0, 0);
 
    //std::cout << binaryPage << std::endl;
-   PQclear(res);
+   //PQclear(res);
 
-   res = PQexec(conn, "CLOSE raw_cursor");
-   checkCommand(res, "Closing raw_cursor", PGRES_COMMAND_OK, conn);
-   PQclear(res);
+   //res = PQexec(conn, "CLOSE raw_cursor");
+   //checkCommand(res, "Closing raw_cursor", PGRES_COMMAND_OK, conn);
+   //PQclear(res);
 
-   res = PQexec(conn, "FETCH ALL IN items_cursor");
-   checkCommand(res, "Fetching from items_cursor", PGRES_TUPLES_OK, conn);
+   //res = PQexec(conn, "FETCH ALL IN items_cursor");
+   //checkCommand(res, "Fetching from items_cursor", PGRES_TUPLES_OK, conn);
 
+   /*
    int nTuples = PQntuples(res);
    int * lp_off = new int[nTuples];
    int * lp_len = new int[nTuples];
@@ -139,17 +62,18 @@ int main(int argc, char** argv) {
    outputFile("footer.html");
 
    res = PQexec(conn, "CLOSE items_cursor");
-   checkCommand(res, "Closing items_cursor", PGRES_COMMAND_OK, conn);
+   //checkCommand(res, "Closing items_cursor", PGRES_COMMAND_OK, conn);
    PQclear(res);
 
    res = PQexec(conn, "END");
-   checkCommand(res, "Ending transaction", PGRES_COMMAND_OK, conn);
+   //checkCommand(res, "Ending transaction", PGRES_COMMAND_OK, conn);
    PQclear(res);
 
    PQfinish(conn);
 
    delete [] lp_off;
    delete [] lp_len;
+   */
 
    return 0;
 }
