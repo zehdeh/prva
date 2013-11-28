@@ -1,13 +1,13 @@
-#include "HTMLRenderer.h"
+#include "html_renderer.h"
 
 #include <iostream>
 #include <fstream>
 #include <string.h>
 
-HTMLRenderer::HTMLRenderer(const char * header_file, const char * footer_file) : Renderer(), header_file(header_file), footer_file(footer_file) {
+html_renderer::html_renderer(const char * header_file, const char * footer_file) : renderer(), header_file(header_file), footer_file(footer_file) {
 }
 
-void HTMLRenderer::output_file(const char * fileName) {
+void html_renderer::output_file(const char * fileName) {
    std::ifstream fileStream(fileName, std::ios::in);
       std::cout << fileName << std::endl;
 
@@ -23,7 +23,7 @@ void HTMLRenderer::output_file(const char * fileName) {
    }
 }
 
-std::string HTMLRenderer::render() {
+std::string html_renderer::render() {
    output_file(header_file); 
 
    output_file(footer_file); 

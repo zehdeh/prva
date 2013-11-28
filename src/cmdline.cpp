@@ -25,9 +25,9 @@
 
 #include "cmdline.h"
 
-const char *gengetopt_args_info_purpose = "";
+const char *gengetopt_args_info_purpose = "postgres relation version analyzer";
 
-const char *gengetopt_args_info_usage = "Usage: psql_versionanalyzer [OPTIONS] --database DATABASE --relation RELNAME";
+const char *gengetopt_args_info_usage = "Usage: prva [OPTIONS] --database DATABASE --relation RELNAME";
 
 const char *gengetopt_args_info_versiontext = "";
 

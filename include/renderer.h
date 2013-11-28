@@ -3,9 +3,9 @@
 
 #include <sstream>
 
-class Renderer {
+class renderer {
 public:
-   Renderer() : output() {}
+   renderer() : output() {}
    virtual std::string render() = 0;
 protected:
    std::ostringstream output;

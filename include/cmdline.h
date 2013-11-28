@@ -21,17 +21,17 @@ extern "C" {
 
 #ifndef CMDLINE_PARSER_PACKAGE
 /** @brief the program name (used for printing errors) */
-#define CMDLINE_PARSER_PACKAGE "psql_versionanalyzer"
+#define CMDLINE_PARSER_PACKAGE "prva"
 #endif
 
 #ifndef CMDLINE_PARSER_PACKAGE_NAME
 /** @brief the complete program name (used for help and version) */
-#define CMDLINE_PARSER_PACKAGE_NAME "psql_versionanalyzer"
+#define CMDLINE_PARSER_PACKAGE_NAME "prva"
 #endif
 
 #ifndef CMDLINE_PARSER_VERSION
 /** @brief the program version */
-#define CMDLINE_PARSER_VERSION "1.0"
+#define CMDLINE_PARSER_VERSION "1.0.1"
 #endif
 
 /** @brief Where the command line options are stored */

@@ -1,11 +1,11 @@
 #ifndef HTMLRENDERER_HEADER
 #define HTMLRENDERER_HEADER
 
-#include "Renderer.h"
+#include "renderer.h"
 
-class HTMLRenderer : public Renderer {
+class html_renderer : public renderer {
 public:
-   HTMLRenderer(const char * header_file, const char * footer_file);
+   html_renderer(const char * header_file, const char * footer_file);
    std::string render();
 private:
    const char * header_file;

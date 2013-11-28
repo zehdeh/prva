@@ -2,8 +2,8 @@
 #include <stdlib.h>
 
 #include "cmdline.h"
-#include "HTMLRenderer.h"
-#include "AnalyzerSetup.h"
+#include "html_renderer.h"
+#include "database_wrapper.h"
 
 #define PGDATABASE test
 
@@ -15,21 +15,24 @@ int main(int argc, char** argv) {
    }
 
    const char * conninfo = (std::string("dbname=") + std::string(args_info.database_arg)).c_str();
-   std::cout << conninfo << std::endl;
-
    try {
-      AnalyzerSetup setup(conninfo, args_info.relation_arg);
+      database_wrapper setup(conninfo, args_info.relation_arg);
 
-      int freespace_lbound = setup.get_freespace_lower_bound();
-      int freespace_ubound = setup.get_freespace_upper_bound();
-      std::cout << freespace_lbound << ":" << freespace_ubound << std::endl;
+      relation_properties props = setup.pack_relation_properties(); 
+
+      std::cout << props.freespace_lbound << ":" << props.freespace_ubound << std::endl;
+      std::cout << props.raw_page << std::endl;
+      for(unsigned int i = 0; i < props.cnt_tuples; i++) {
+         std::cout << props.lp_off[i] << " " << props.lp_len[i] << std::endl;
+      }
+
    } catch(const std::exception &e) {
       std::cerr << e.what() << std::endl;
       return 1;
    }
 
 
-   HTMLRenderer renderer("resource/footer.html", "resource/header.html");
+   html_renderer renderer("resource/footer.html", "resource/header.html");
    std::cout << renderer.render();
 
    //char * binaryPage = PQgetvalue(res, 0, 0);

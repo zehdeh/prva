@@ -4,7 +4,7 @@ OBJDIR = obj/
 SRCDIR = src/
 INCDIRS = include/ 
 INC = $(foreach d, $(INCDIRS), -I$d)
-OUTPUT = test
+OUTPUT = prva
 
 RM = rm -rf
 
