@@ -1,3 +1,11 @@
-psql
+prva
 ====
-Table users needed in order to run
+postgres relation version analyzer
+
+building
+===
+Both libpq and libpqxx needed in order to compile
+
+usage
+===
+Use "--help" for information on usage
