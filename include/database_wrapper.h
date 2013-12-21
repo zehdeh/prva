@@ -7,13 +7,15 @@
 class database_wrapper {
 public:
    database_wrapper(const char * conninfo, const char * pRelation);
-   ~database_wrapper();
+   ~database_wrapper() {};
 
    unsigned int get_freespace_lower_bound();
    unsigned int get_freespace_upper_bound();
    std::string get_raw_page();
-   unsigned int * get_lp_off();
-   unsigned int * get_lp_len();
+   std::vector<unsigned int> get_lp_off();
+   std::vector<unsigned int> get_lp_len();
+   std::vector<unsigned int> get_xmin();
+   std::vector<unsigned int> get_xmax();
    unsigned int get_cnt_tuples();
 
    relation_properties pack_relation_properties();
@@ -29,8 +31,10 @@ private:
 
    std::string raw_page;
 
-   unsigned int * lp_off;
-   unsigned int * lp_len;
+   std::vector<unsigned int> lp_off;
+   std::vector<unsigned int> lp_len;
+   std::vector<unsigned int> xmin;
+   std::vector<unsigned int> xmax;
 
    unsigned int cnt_tuples;
 

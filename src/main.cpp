@@ -15,25 +15,19 @@ int main(int argc, char** argv) {
    }
 
    const char * conninfo = (std::string("dbname=") + std::string(args_info.database_arg)).c_str();
+   relation_properties props;
    try {
       database_wrapper setup(conninfo, args_info.relation_arg);
-
-      relation_properties props = setup.pack_relation_properties(); 
-
-      std::cout << props.freespace_lbound << ":" << props.freespace_ubound << std::endl;
-      std::cout << props.raw_page << std::endl;
-      for(unsigned int i = 0; i < props.cnt_tuples; i++) {
-         std::cout << props.lp_off[i] << " " << props.lp_len[i] << std::endl;
-      }
-
+      props = setup.pack_relation_properties(); 
+      
+      html_renderer renderer(props, "resource/header.html", "resource/footer.html");
+      std::cout << renderer.render();
    } catch(const std::exception &e) {
       std::cerr << e.what() << std::endl;
       return 1;
    }
 
 
-   html_renderer renderer("resource/footer.html", "resource/header.html");
-   std::cout << renderer.render();
 
    //char * binaryPage = PQgetvalue(res, 0, 0);
 

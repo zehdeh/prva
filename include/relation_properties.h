@@ -1,14 +1,18 @@
 #ifndef RELATION_PROPERTIES_HEADER
 #define RELATION_PROPERTIES_HEADER
 
+#include <vector>
+
 struct relation_properties {
    unsigned int freespace_lbound;
    unsigned int freespace_ubound;
 
    std::string raw_page;
 
-   unsigned int * lp_off;
-   unsigned int * lp_len;
+   std::vector<unsigned int> lp_off;
+   std::vector<unsigned int> lp_len;
+   std::vector<unsigned int> xmin;
+   std::vector<unsigned int> xmax;
    unsigned int cnt_tuples;
 };
 

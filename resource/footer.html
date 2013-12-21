@@ -1,5 +1,3 @@
-</div>
-<div id="controls">
    <input type="checkbox" name="show_freespace" id="show_freespace" onchange="toggleFreespace()"><label for="show_freespace">Show freespace</label>
 </div>
 <br class="clear">
@@ -11,6 +9,30 @@
          freespace_range.style.display = "inline";
       } else {
          freespace_range.style.display = "none";
+      }
+   }
+   
+   function highlight_rows(tid) {
+      var tuples = document.getElementsByClassName("tuple");
+      for(i = 0; i < tuples.length; i++) {
+         xmin = tuples[i].dataset.xmin;
+         xmax = tuples[i].dataset.xmax;
+
+         if(xmin <= tid && (tid <= xmax || xmax == 0)) {
+            tuples[i].classList.add("highlight");
+         }
+      }
+   }
+
+   function unhighlight_rows(tid) {
+      var tuples = document.getElementsByClassName("tuple");
+      for(i = 0; i < tuples.length; i++) {
+         xmin = tuples[i].dataset.xmin;
+         xmax = tuples[i].dataset.xmax;
+
+         if(xmin <= tid && (tid <= xmax || xmax == 0)) {
+            tuples[i].classList.remove("highlight");
+         }
       }
    }
 

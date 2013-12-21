@@ -3,12 +3,15 @@
 
 #include <sstream>
 
+#include "relation_properties.h"
+
 class renderer {
 public:
-   renderer() : output() {}
+   renderer(relation_properties props) : output(), relation_props(props) {}
    virtual std::string render() = 0;
 protected:
    std::ostringstream output;
+   relation_properties relation_props;
 };
 
 #endif

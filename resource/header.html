@@ -6,6 +6,7 @@
          font-size: 9px;
          width: 600px;
          float: left;
+         min-height: 500px;
       }
       .range.freespace {
          color: lightgrey;
@@ -13,8 +14,25 @@
       .range.tuple {
          border: 1px solid grey;
       }
+      .range.tuple.highlight {
+         background-color: lightblue;
+      }
+      .transaction {
+         width: 200px;
+         height: 20px;
+      }
+      .transaction.insert {
+         background-color: lightblue;
+      }
+      .transaction.update {
+         background-color: yellow;
+      }
+      .transaction.delete {
+         background-color: red;
+      }
       #controls {
          font-family: arial;
+         font-size: 10pt;
          float:left;
          width: 200px;
          border: 1px solid grey;
@@ -25,4 +43,3 @@
       </style>
    </head>
    <body>
-      <div id="page">
