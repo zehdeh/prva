@@ -12,6 +12,7 @@ relation_properties database_wrapper::pack_relation_properties() {
    props.xmin = get_xmin();
    props.xmax = get_xmax();
    props.cnt_tuples = get_cnt_tuples();
+   props.types = get_types();
 
    return props;
 }
@@ -36,11 +37,24 @@ std::vector<unsigned int> database_wrapper::get_lp_off() {
 }
 
 std::vector<unsigned int> database_wrapper::get_lp_len() {
-   if(lp_len.empty()) {
-      get_heap_page_items();
+   if(types.empty()) {
+      
    }
 
    return lp_len;
+}
+
+std::vector<unsigned int> database_wrapper::get_types() {
+   if(types.empty()) {
+      pqxx::result res = do_get_types();
+
+      int cnt_types = res.size();
+      for(int i = 0; i < cnt_types; i++) {
+         types.push_back(res[i]["atttypid"].as<unsigned int>());
+      }
+   }
+
+   return types;
 }
 
 std::vector<unsigned int> database_wrapper::get_xmin() {
@@ -65,12 +79,10 @@ void database_wrapper::get_heap_page_items() {
    cnt_tuples = res.size();
    
    for(unsigned int i = 0; i < res.size(); i++) {
-      lp_off.push_back(res[i]["lp_off"].as<unsigned int>() * 2);
-      lp_len.push_back(res[i]["lp_len"].as<unsigned int>() * 2);
+      lp_off.push_back(res[i]["lp_off"].as<unsigned int>());
+      lp_len.push_back(res[i]["lp_len"].as<unsigned int>());
       xmin.push_back(res[i]["t_xmin"].as<unsigned int>());
       xmax.push_back(res[i]["t_xmax"].as<unsigned int>());
-      //std::cout << lp_off[i] << std::endl;
-      //std::cout << lp_len[i] << std::endl;
    }
 }
 
@@ -89,22 +101,22 @@ unsigned int database_wrapper::get_freespace_lower_bound() {
       get_freespace_bounds();
    }
 
-   return freespace_lbound; 
-}  
+   return freespace_lbound;
+}
 
 unsigned int database_wrapper::get_freespace_upper_bound() {
    if(!freespace_queried) {
       get_freespace_bounds();
    }
 
-   return freespace_ubound; 
-}  
+   return freespace_ubound;
+}
 
 void database_wrapper::get_freespace_bounds() {
    pqxx::result result = do_get_freespace_bounds();
 
-   freespace_lbound = result[0]["lower"].as<unsigned int>() * 2;
-   freespace_ubound = result[0]["upper"].as<unsigned int>() * 2;
+   freespace_lbound = result[0]["lower"].as<unsigned int>();
+   freespace_ubound = result[0]["upper"].as<unsigned int>();
 
    freespace_queried = true;
 }
@@ -119,4 +131,8 @@ pqxx::result database_wrapper::do_get_raw_page() {
 
 pqxx::result database_wrapper::do_get_heap_page_items() {
    return work.exec("SELECT t_xmin, t_xmax, lp_off, lp_len FROM heap_page_items(get_raw_page('" + relation + "', 0)) order by lp desc");
+}
+
+pqxx::result database_wrapper::do_get_types() {
+   return work.exec("select atttypid from pg_attribute where attrelid = (select oid from pg_class where relname = '" + relation + "') and attnum > 0");
 }

@@ -13,6 +13,7 @@ struct relation_properties {
    std::vector<unsigned int> lp_len;
    std::vector<unsigned int> xmin;
    std::vector<unsigned int> xmax;
+   std::vector<unsigned int> types;
    unsigned int cnt_tuples;
 };
 

@@ -2,7 +2,7 @@ CPPFLAGS = -Wall -g
 LDFLAGS = -lpqxx
 OBJDIR = obj/
 SRCDIR = src/
-INCDIRS = include/ 
+INCDIRS = include/
 INC = $(foreach d, $(INCDIRS), -I$d)
 OUTPUT = prva
 

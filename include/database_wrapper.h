@@ -16,6 +16,7 @@ public:
    std::vector<unsigned int> get_lp_len();
    std::vector<unsigned int> get_xmin();
    std::vector<unsigned int> get_xmax();
+   std::vector<unsigned int> get_types();
    unsigned int get_cnt_tuples();
 
    relation_properties pack_relation_properties();
@@ -35,8 +36,10 @@ private:
    std::vector<unsigned int> lp_len;
    std::vector<unsigned int> xmin;
    std::vector<unsigned int> xmax;
+   std::vector<unsigned int> types;
 
    unsigned int cnt_tuples;
+   unsigned int cnt_types;
 
    void get_freespace_bounds();
    void get_heap_page_items();
@@ -44,6 +47,7 @@ private:
    pqxx::result do_get_freespace_bounds();
    pqxx::result do_get_raw_page();
    pqxx::result do_get_heap_page_items();
+   pqxx::result do_get_types();
 };
 
 #endif

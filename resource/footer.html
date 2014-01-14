@@ -1,8 +1,34 @@
-   <input type="checkbox" name="show_freespace" id="show_freespace" onchange="toggleFreespace()"><label for="show_freespace">Show freespace</label>
-</div>
-<br class="clear">
 <script type="text/javascript">
+   document.onclick = hide_valueviews;
+   var overlay  = document.getElementById("overlay");
+   
+   function hide_valueviews() {
+      var valueviews = document.getElementsByClassName("valueview");
+      for(i = 0; i < valueviews.length; i++) {
+         valueviews[i].style.display = "none";
+      }
+      overlay.style.display = "none";
 
+      var ranges = document.getElementsByClassName("range");
+      for(i = 0; i < ranges.length; i++) {
+         ranges[i].style.zIndex = 0;
+      }
+
+      return false;
+   } 
+
+   function show_valueview(id) {
+      var valueview = document.getElementById(id);
+
+      overlay.style.display = "block";
+      valueview.style.display = "block";
+      event.cancelBubble = true;
+      event.target.style.zIndex = 99;
+
+      valueview.style.top = event.target.offsetTop + event.target.offsetHeight;
+
+      return false;
+   }
    function toggleFreespace() {
       var freespace_range = document.getElementsByClassName("freespace")[0];
       if(freespace_range.style.display == "none") {
@@ -10,8 +36,12 @@
       } else {
          freespace_range.style.display = "none";
       }
+
+      event.cancelBubble = true;
+
+      return true;
    }
-   
+
    function highlight_rows(tid) {
       var tuples = document.getElementsByClassName("tuple");
       for(i = 0; i < tuples.length; i++) {
@@ -20,6 +50,9 @@
 
          if(xmin <= tid && (tid <= xmax || xmax == 0)) {
             tuples[i].classList.add("highlight");
+            if(tid == xmax) {
+               tuples[i].classList.add("delete");
+            }
          }
       }
    }
@@ -32,6 +65,7 @@
 
          if(xmin <= tid && (tid <= xmax || xmax == 0)) {
             tuples[i].classList.remove("highlight");
+            tuples[i].classList.remove("delete");
          }
       }
    }
