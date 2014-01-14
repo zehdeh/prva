@@ -21,7 +21,13 @@ int main(int argc, char** argv) {
       props = setup.pack_relation_properties(); 
       
       html_renderer renderer(props, "resource/header.html", "resource/footer.html");
-      std::cout << renderer.render();
+      //renderer.render();
+      if(args_info.debug_flag) {
+         renderer.render();
+         std::cout << renderer.getLog();
+      } else {
+         std::cout << renderer.render();
+      }
    } catch(const std::exception &e) {
       std::cerr << e.what() << std::endl;
       return 1;

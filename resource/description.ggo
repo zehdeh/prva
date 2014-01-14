@@ -3,5 +3,6 @@ version "1.0.1"
 purpose "postgres relation version analyzer"
 usage "prva [OPTIONS] --database DATABASE --relation RELNAME"
 description "Outputs non-vacuumed states of tuples from a given a relation as they appear on a postgres-page"
+option "debug" D "Instead of rendering a result show debug log" flag off
 option "relation" r "The relation that should be analyzed" string typestr="RELATION" required
-option "database" d "The database that contains the relation" string typestr="RELATION" required
+option "database" d "The database that contains the relation" string typestr="DATABASE" required

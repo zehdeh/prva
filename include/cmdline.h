@@ -39,6 +39,8 @@ struct gengetopt_args_info
 {
   const char *help_help; /**< @brief Print help and exit help description.  */
   const char *version_help; /**< @brief Print version and exit help description.  */
+  int debug_flag;	/**< @brief Instead of rendering a result show debug log (default=off).  */
+  const char *debug_help; /**< @brief Instead of rendering a result show debug log help description.  */
   char * relation_arg;	/**< @brief The relation that should be analyzed.  */
   char * relation_orig;	/**< @brief The relation that should be analyzed original value given at command line.  */
   const char *relation_help; /**< @brief The relation that should be analyzed help description.  */
@@ -48,6 +50,7 @@ struct gengetopt_args_info
   
   unsigned int help_given ;	/**< @brief Whether help was given.  */
   unsigned int version_given ;	/**< @brief Whether version was given.  */
+  unsigned int debug_given ;	/**< @brief Whether debug was given.  */
   unsigned int relation_given ;	/**< @brief Whether relation was given.  */
   unsigned int database_given ;	/**< @brief Whether database was given.  */
 
