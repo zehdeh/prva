@@ -7,7 +7,7 @@
 
 class html_renderer : public renderer {
 public:
-   html_renderer(relation_properties props, const char * header_file, const char * footer_file);
+   html_renderer(const relation_properties & props, const char * header_file, const char * footer_file);
    std::string render();
    std::string getLog() { return log.str(); }
 private:
@@ -19,6 +19,7 @@ private:
    void render_page();
    void render_transactions();
 
+   void render_title();
    void render_valueviews();
    void render_headervalues();
    void render_tuplevalues();

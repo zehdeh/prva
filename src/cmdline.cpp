@@ -31,20 +31,22 @@ const char *gengetopt_args_info_usage = "Usage: prva [OPTIONS] --database DATABA
 
 const char *gengetopt_args_info_versiontext = "";
 
-const char *gengetopt_args_info_description = "Outputs non-vacuumed states of tuples from a given a relation as they appear on\na postgres-page";
+const char *gengetopt_args_info_description = "Outputs non-vacuumed states of tuples from a given a relation as they appear on\na postgres-page.";
 
 const char *gengetopt_args_info_help[] = {
   "  -h, --help               Print help and exit",
   "  -V, --version            Print version and exit",
-  "  -D, --debug              Instead of rendering a result show debug log\n                             (default=off)",
-  "  -r, --relation=RELATION  The relation that should be analyzed",
-  "  -d, --database=DATABASE  The database that contains the relation",
+  "  -D, --debug              Instead of rendering a result show debug log.\n                             (default=off)",
+  "  -r, --relation=RELATION  The relation to be analyzed.",
+  "  -d, --database=DATABASE  The database that contains the relation.",
+  "  -p, --page_nr=INT        The number of the page of the analyzed relation.\n                             Negative values are ignored.  (default=`0')",
     0
 };
 
 typedef enum {ARG_NO
   , ARG_FLAG
   , ARG_STRING
+  , ARG_INT
 } cmdline_parser_arg_type;
 
 static
@@ -70,6 +72,7 @@ void clear_given (struct gengetopt_args_info *args_info)
   args_info->debug_given = 0 ;
   args_info->relation_given = 0 ;
   args_info->database_given = 0 ;
+  args_info->page_nr_given = 0 ;
 }
 
 static
@@ -81,6 +84,8 @@ void clear_args (struct gengetopt_args_info *args_info)
   args_info->relation_orig = NULL;
   args_info->database_arg = NULL;
   args_info->database_orig = NULL;
+  args_info->page_nr_arg = 0;
+  args_info->page_nr_orig = NULL;
   
 }
 
@@ -94,6 +99,7 @@ void init_args_info(struct gengetopt_args_info *args_info)
   args_info->debug_help = gengetopt_args_info_help[2] ;
   args_info->relation_help = gengetopt_args_info_help[3] ;
   args_info->database_help = gengetopt_args_info_help[4] ;
+  args_info->page_nr_help = gengetopt_args_info_help[5] ;
   
 }
 
@@ -181,6 +187,7 @@ cmdline_parser_release (struct gengetopt_args_info *args_info)
   free_string_field (&(args_info->relation_orig));
   free_string_field (&(args_info->database_arg));
   free_string_field (&(args_info->database_orig));
+  free_string_field (&(args_info->page_nr_orig));
   
   
 
@@ -221,6 +228,8 @@ cmdline_parser_dump(FILE *outfile, struct gengetopt_args_info *args_info)
     write_into_file(outfile, "relation", args_info->relation_orig, 0);
   if (args_info->database_given)
     write_into_file(outfile, "database", args_info->database_orig, 0);
+  if (args_info->page_nr_given)
+    write_into_file(outfile, "page_nr", args_info->page_nr_orig, 0);
   
 
   i = EXIT_SUCCESS;
@@ -424,6 +433,9 @@ int update_arg(void *field, char **orig_field,
   case ARG_FLAG:
     *((int *)field) = !*((int *)field);
     break;
+  case ARG_INT:
+    if (val) *((int *)field) = strtol (val, &stop_char, 0);
+    break;
   case ARG_STRING:
     if (val) {
       string_field = (char **)field;
@@ -436,6 +448,17 @@ int update_arg(void *field, char **orig_field,
     break;
   };
 
+  /* check numeric conversion */
+  switch(arg_type) {
+  case ARG_INT:
+    if (val && !(stop_char && *stop_char == '\0')) {
+      fprintf(stderr, "%s: invalid numeric value: %s\n", package_name, val);
+      return 1; /* failure */
+    }
+    break;
+  default:
+    ;
+  };
 
   /* store the original value */
   switch(arg_type) {
@@ -500,10 +523,11 @@ cmdline_parser_internal (
         { "debug",	0, NULL, 'D' },
         { "relation",	1, NULL, 'r' },
         { "database",	1, NULL, 'd' },
+        { "page_nr",	1, NULL, 'p' },
         { 0,  0, 0, 0 }
       };
 
-      c = getopt_long (argc, argv, "hVDr:d:", long_options, &option_index);
+      c = getopt_long (argc, argv, "hVDr:d:p:", long_options, &option_index);
 
       if (c == -1) break;	/* Exit from `while (1)' loop.  */
 
@@ -519,7 +543,7 @@ cmdline_parser_internal (
           cmdline_parser_free (&local_args_info);
           exit (EXIT_SUCCESS);
 
-        case 'D':	/* Instead of rendering a result show debug log.  */
+        case 'D':	/* Instead of rendering a result show debug log..  */
         
         
           if (update_arg((void *)&(args_info->debug_flag), 0, &(args_info->debug_given),
@@ -529,7 +553,7 @@ cmdline_parser_internal (
             goto failure;
         
           break;
-        case 'r':	/* The relation that should be analyzed.  */
+        case 'r':	/* The relation to be analyzed..  */
         
         
           if (update_arg( (void *)&(args_info->relation_arg), 
@@ -541,7 +565,7 @@ cmdline_parser_internal (
             goto failure;
         
           break;
-        case 'd':	/* The database that contains the relation.  */
+        case 'd':	/* The database that contains the relation..  */
         
         
           if (update_arg( (void *)&(args_info->database_arg), 
@@ -549,6 +573,18 @@ cmdline_parser_internal (
               &(local_args_info.database_given), optarg, 0, 0, ARG_STRING,
               check_ambiguity, override, 0, 0,
               "database", 'd',
+              additional_error))
+            goto failure;
+        
+          break;
+        case 'p':	/* The number of the page of the analyzed relation. Negative values are ignored..  */
+        
+        
+          if (update_arg( (void *)&(args_info->page_nr_arg), 
+               &(args_info->page_nr_orig), &(args_info->page_nr_given),
+              &(local_args_info.page_nr_given), optarg, 0, "0", ARG_INT,
+              check_ambiguity, override, 0, 0,
+              "page_nr", 'p',
               additional_error))
             goto failure;
         

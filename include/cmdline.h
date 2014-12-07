@@ -39,20 +39,24 @@ struct gengetopt_args_info
 {
   const char *help_help; /**< @brief Print help and exit help description.  */
   const char *version_help; /**< @brief Print version and exit help description.  */
-  int debug_flag;	/**< @brief Instead of rendering a result show debug log (default=off).  */
-  const char *debug_help; /**< @brief Instead of rendering a result show debug log help description.  */
-  char * relation_arg;	/**< @brief The relation that should be analyzed.  */
-  char * relation_orig;	/**< @brief The relation that should be analyzed original value given at command line.  */
-  const char *relation_help; /**< @brief The relation that should be analyzed help description.  */
-  char * database_arg;	/**< @brief The database that contains the relation.  */
-  char * database_orig;	/**< @brief The database that contains the relation original value given at command line.  */
-  const char *database_help; /**< @brief The database that contains the relation help description.  */
+  int debug_flag;	/**< @brief Instead of rendering a result show debug log. (default=off).  */
+  const char *debug_help; /**< @brief Instead of rendering a result show debug log. help description.  */
+  char * relation_arg;	/**< @brief The relation to be analyzed..  */
+  char * relation_orig;	/**< @brief The relation to be analyzed. original value given at command line.  */
+  const char *relation_help; /**< @brief The relation to be analyzed. help description.  */
+  char * database_arg;	/**< @brief The database that contains the relation..  */
+  char * database_orig;	/**< @brief The database that contains the relation. original value given at command line.  */
+  const char *database_help; /**< @brief The database that contains the relation. help description.  */
+  int page_nr_arg;	/**< @brief The number of the page of the analyzed relation. Negative values are ignored. (default='0').  */
+  char * page_nr_orig;	/**< @brief The number of the page of the analyzed relation. Negative values are ignored. original value given at command line.  */
+  const char *page_nr_help; /**< @brief The number of the page of the analyzed relation. Negative values are ignored. help description.  */
   
   unsigned int help_given ;	/**< @brief Whether help was given.  */
   unsigned int version_given ;	/**< @brief Whether version was given.  */
   unsigned int debug_given ;	/**< @brief Whether debug was given.  */
   unsigned int relation_given ;	/**< @brief Whether relation was given.  */
   unsigned int database_given ;	/**< @brief Whether database was given.  */
+  unsigned int page_nr_given ;	/**< @brief Whether page_nr was given.  */
 
 } ;
 
